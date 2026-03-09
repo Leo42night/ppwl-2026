@@ -1,0 +1,468 @@
+# Monorepo
+- Frontend: bun, vite, react (ts), tailwind, ShadCN
+- Backend: bun, elysia
+
+Berikut alur lengkap inisiasi monorepo dari awal hingga selesai:
+
+---
+
+## 1. Bootstrap awal
+Disarankan menggunakan terminal basis unix (git bash, mac, linux)
+```bash
+mkdir monorepo && cd monorepo
+```
+
+---
+
+## 2. Init root workspace
+
+```bash
+bun init -y
+```
+
+Lalu **edit `package.json`** di root menjadi:
+
+```json
+{
+  "name": "monorepo",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"]
+}
+```
+
+Hapus `index.ts` yang dibuat bun init — root tidak butuh entry point.
+
+```bash
+rm index.ts
+```
+
+Buat struktur folder (ini adalah perintah unix):
+
+```bash
+mkdir -p apps packages/shared
+```
+
+---
+
+## 3. Init Frontend
+
+```bash
+cd apps
+bunx create-vite frontend --template react-ts # vite beta v8 (No), install with bun & start now (No)
+cd frontend && bun install
+rm -rf .git # hapus git repo hasil inisiasi template vite react
+```
+Jalankan `rm tsconfig.node.json`, kita tidak perlu konfigurasi node backend. hapus juga path reference nya di `tsconfig.json` 
+
+**Install Tailwind v4:**
+
+```bash
+bun add tailwindcss @tailwindcss/vite
+```
+
+**Edit `vite.config.ts`:**
+
+```ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import path from "path";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: { "@": path.resolve(__dirname, "./src") },
+  },
+  server: {
+    port: 5173,
+    proxy: { "/api": { target: "http://localhost:3000", changeOrigin: true } },
+  },
+});
+```
+Jika `tailwindcss()` error load, ikuti [langkah ini](#fix-bug-load-vite-config-tailwindcss).
+
+**Ganti isi `src/index.css`** (hapus semua, ganti dengan):
+
+```css
+@import "tailwindcss";
+```
+
+**Setup shadcn/ui:**
+
+Shadcn membaca [**`tsconfig.json`**](https://ui.shadcn.com/docs/installation/manual), bukan **`tsconfig.app.json`**. Buka  dan Tambahkan settingan path ini ke dalam **`tsconfig.json`** (dibutuhkan shadcn ketika init) dan **`tsconfig.app.json`** (dibutuhkan Vite React bisa baca path):
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+```
+Simpan, lalu jalankan:
+
+```bash
+bunx --bun shadcn@latest init
+```
+Ikuti prompt:
+- component library → **Radix**
+- preset → **Nova**
+
+Setelah init, tambah komponen yang dibutuhkan, kita test pakai:
+
+```bash
+bunx --bun shadcn@latest add button
+```
+
+Ganti isi `App.tsx` dengan ini:
+```typescript
+import { Button } from "@/components/ui/button"
+
+function App() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 min-h-screen">
+      
+      <Button>Default</Button>
+
+      <Button variant="secondary">
+        Secondary
+      </Button>
+
+      <Button variant="destructive">
+        Delete
+      </Button>
+
+      <Button variant="outline">
+        Outline
+      </Button>
+
+      <Button variant="ghost">
+        Ghost
+      </Button>
+
+      <Button variant="link">
+        Link
+      </Button>
+
+    </div>
+  )
+}
+
+export default App
+```
+Test dengan menjalankan `bun dev`
+
+---
+
+## 4. Init Backend
+
+```bash
+cd ../../apps
+mkdir backend && cd backend
+bun init -y
+```
+
+**Edit `package.json`** backend:
+
+```json
+{
+  "name": "backend",
+  "module": "src/index.ts",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun dist/index.js"
+  }
+}
+```
+
+Rapikan struktur:
+
+```bash
+rm index.ts
+mkdir src
+```
+
+**Install Elysia + plugin:**
+Swagger adalah plugin dokumentasi API berbasis OpenAPI
+```bash
+bun add elysia @elysiajs/cors @elysiajs/swagger
+bun add -d @types/bun
+```
+
+Buat **`src/index.ts`:**
+
+```ts
+import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
+import { swagger } from "@elysiajs/swagger";
+
+const app = new Elysia()
+  .use(cors({ origin: ["http://localhost:5173"] }))
+  .use(swagger())
+  .get("/", () => ({ status: "ok" }))
+  .listen(3000);
+
+console.log(`🦊 Backend → http://localhost:${app.server?.port}`);
+console.log(`📖 Swagger → http://localhost:${app.server?.port}/swagger`);
+
+export type App = typeof app;
+```
+
+Test server dengan menjalankan `bun dev`
+
+Test **cors** dengan buat file `apps\frontend\src\ApiTest.tsx`:
+```typescript
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+
+function App() {
+  const [response, setResponse] = useState<string>("")
+
+  const handleClick = async () => {
+    try {
+      const res = await fetch("http://localhost:3000")
+      const data = await res.text()
+
+      setResponse(data)
+    } catch (error) {
+      console.error(error)
+      setResponse("Error connecting to server")
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      
+      <Button onClick={handleClick}>
+        Get Response
+      </Button>
+
+      <div className="p-4 border rounded w-96">
+        <b>Server Response:</b>
+        <p>{response}</p>
+      </div>
+
+    </div>
+  )
+}
+
+export default App
+```
+Ganti elemen `App.tsx` di `main.tsx` dengan elemen `ApiTest.tsx`:
+```typescript
+// import App from './App.tsx'
+import App from './ApiTest'
+```
+Jalankan server Backend & Frontend, lalu test trigger button di Frontend.
+
+---
+## 5. Setup Shared Package
+Berisi shared item atau types yang dapat tiap apps akses.
+
+```bash
+cd ../../packages/shared
+bun init -y
+rm README.md 
+```
+
+**Edit `package.json`:**
+
+```json
+{
+  "name": "shared",
+  "private": true,
+  "module": "./src/index.ts",
+  "exports": { ".": "./src/index.ts" }
+}
+```
+
+Buat **`src/index.ts`** berisi shared types:
+
+```ts
+export interface HealthCheck {
+  status: string
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+}
+```
+
+---
+
+## 6. Hubungkan workspace dependencies
+
+Kembali ke root:
+
+```bash
+cd ../../
+```
+
+**Edit `apps/frontend/package.json` & `apps/backend/package.json`** — tambahkan:
+
+```json
+{
+  "dependencies": {
+    "shared": "workspace:*"
+  }
+}
+```
+
+---
+
+## 7. Root `tsconfig.json`
+
+Buat di root:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true
+  }
+}
+```
+
+---
+
+## 8. Root scripts
+
+**Edit root `package.json`** tambahkan scripts:
+
+```json
+{
+  "name": "monorepo",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:frontend": "bun run --filter frontend dev",
+    "dev:backend": "bun run --filter backend dev",
+    "build": "bun run --filter '*' build"
+  }
+}
+```
+
+---
+
+## 9. Install semua dan jalankan
+
+```bash
+bun install
+```
+
+Bun akan resolve semua workspace dependencies termasuk `shared` secara otomatis.
+
+> **Tip:** Setelah `bun install` di root, jangan jalankan `bun install` lagi di dalam subfolder. Bun workspace mengelola semua dependencies dari root secara terpusat.
+
+```bash
+# Jalankan keduanya
+bun dev
+
+# Atau masing-masing
+bun dev:frontend   # http://localhost:5173
+bun dev:backend    # http://localhost:3000
+                   # http://localhost:3000/swagger
+```
+
+## 10. Implementasi shared type di Frontend & Backend
+
+pada `backend/src/index.ts`, tambahkan type **ApiResponse**:
+```ts
+import type { ApiResponse, HealthCheck } from "shared";
+
+const app = new Elysia()
+  // ...
+  .get("/", (): ApiResponse<HealthCheck> => {
+    return {
+      data: { status: "ok" },
+      message: "server running" 
+    }
+  })
+```
+
+pada `frontend/src/ApiTest.tsx`, modifikasi untuk menggunakan type **ApiResponse**:
+```ts
+import type { ApiResponse, HealthCheck } from "shared";
+
+function App() {
+  const [response, setResponse] = useState<string>("")
+
+  const handleClick = async () => {
+    try {
+      const res = await fetch("http://localhost:3000")
+      const data: ApiResponse<HealthCheck> = await res.json()
+
+      setResponse(data.data.status)
+```
+---
+
+## Struktur akhir
+
+```
+monorepo/
+├── apps/
+│   ├── frontend/
+│   │   ├── src/
+│   │   │   ├── components/ui/   ← shadcn components
+│   │   │   ├── index.css        ← @import "tailwindcss"
+│   │   │   └── ...
+│   │   ├── vite.config.ts
+│   │   └── components.json      ← shadcn config
+│   └── backend/
+│       └── src/
+│           └── index.ts         ← Elysia entry point
+├── packages/
+│   └── shared/
+│       └── src/index.ts         ← Shared types
+├── package.json                 ← workspace root
+└── tsconfig.json
+```
+
+---
+
+
+
+Lanjutan tutorial ada di [**PHASE-2.md**](monorepo-2.md)
+
+
+## Bug Handling
+Mengatasi berbagai masalah yang mungkin terjadi.
+
+### Fix Bug load vite config tailwindcss
+
+Jika `tailwindcss()` error load, itu karena `@tailwindcss/vite` dan `@vitejs/plugin-react` masing-masing menarik versi vite sendiri karena tidak ada single hoisted version yang di-pin di root. 
+
+1. Pin vite di root `package.json`
+
+Tambahkan `vite` sebagai devDependency di **root `package.json`** agar semua workspace pakai instance yang sama:
+
+```json
+{
+  "name": "monorepo",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}
+```
+
+> Gunakan **vite 6**, bukan 7, karena `@tailwindcss/vite` saat ini lebih stabil di v6. Cek versi terbaru yang kompatibel di [npmjs.com/package/@tailwindcss/vite](https://www.npmjs.com/package/@tailwindcss/vite).
+
+2. Lalu hapus cache dan install ulang
+
+```bash
+# Di root monorepo
+rm -rf node_modules
+bun install
+```
+---
