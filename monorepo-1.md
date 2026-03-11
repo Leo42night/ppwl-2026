@@ -82,7 +82,7 @@ export default defineConfig({
   },
 });
 ```
-Jika `tailwindcss()` error load, ikuti [langkah ini](#fix-bug-load-vite-config-tailwindcss).
+Jika `tailwindcss()` atau module apapun yang error load, ikuti [langkah ini](#fix-bug-load-dependencies).
 
 **Ganti isi `src/index.css`** (hapus semua, ganti dengan):
 
@@ -477,32 +477,11 @@ nvm install <node_version> # install versi node, cth: `nvm install 25`
 nvm use <node_version> # pilih versi node, cth: `nvm use 25`
 ```
 
-### Fix Bug load vite config tailwindcss
-
-Jika `tailwindcss()` error load, itu karena `@tailwindcss/vite` dan `@vitejs/plugin-react` masing-masing menarik versi vite sendiri karena tidak ada single hoisted version yang di-pin di root. 
-
-1. Pin vite di root `package.json`
-
-Tambahkan `vite` sebagai devDependency di **root `package.json`** agar semua workspace pakai instance yang sama:
-
-```json
-{
-  "name": "monorepo",
-  "private": true,
-  "workspaces": ["apps/*", "packages/*"],
-  "devDependencies": {
-    "vite": "^6.3.5"
-  }
-}
-```
-
-> Gunakan **vite 6**, bukan 7, karena `@tailwindcss/vite` saat ini lebih stabil di v6. Cek versi terbaru yang kompatibel di [npmjs.com/package/@tailwindcss/vite](https://www.npmjs.com/package/@tailwindcss/vite).
-
-2. Lalu hapus cache dan install ulang
-
+### Fix Bug load dependencies
+Jika di `import {...} from '...'` module tidak ditemukan, walau sudah di install, coba lakukan ini:
+1. Hapus cache dan install ulang:
 ```bash
-# Di root monorepo
-rm -rf node_modules
+rm -rf node_modules # patikan di lokasi apps/ yang tepat -> `apps/frontend/` atau `apps/backend/`
 bun install
 ```
----
+2. Di VSCode, buka file ts yang error, lalu ketik `Ctrl+Shift+P`, jalankan `TypeScript: Restart TS Server` (VSCode akan deteksi ulang module). 
