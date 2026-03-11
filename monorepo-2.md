@@ -75,7 +75,7 @@ bunx --bun prisma generate # generate the Prisma Client
 
 Buat `apps/backend/prisma/db.ts`:
 ```ts
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 
 const adapter = new PrismaLibSql({ url: process.env.DATABASE_URL || "" });
@@ -118,12 +118,12 @@ jalankan: `bun prisma/seed.ts` (insert data user ke database)
 
 # 4. Backend API
 
-`packages/backend/src/server.ts`
+`packages/backend/src/index.ts`
 
 Menggunakan **ElysiaJs** (ringan untuk Bun). Modifikasi dengan menambahkan prisma untuk kelola path `"/user"`. Tambahkan port di cors origin apabila port frontend berubah (cth: 5174)
 
 ```ts
-import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaClient } from "./generated/prisma/client";
 import { prisma } from '../prisma/db';
 import type { ApiResponse, HealthCheck, User } from "shared";
 
