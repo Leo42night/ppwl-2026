@@ -441,7 +441,7 @@ Lanjutan tutorial ada di [**PHASE-2.md**](monorepo-2.md)
 Mengatasi berbagai masalah yang mungkin terjadi.
 
 ### setup Git Bash in terminal
-Jika git bash tidak tersedia di menu terminal (jika ketika di windows, lalu ketik `bash` tidak membuka git bash), coba lakukan ini:
+Jika git bash tidak tersedia di menu terminal (di terminal cmd/powershell, ketik `bash` tidak membuka git bash), coba lakukan ini:
 
 1. tambahkan `C:\Program Files\Git\bin` ke path Environment Variable User dan System (pastika folder ada).
 2. Buka Terminal, lalu buka setting.
