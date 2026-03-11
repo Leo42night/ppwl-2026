@@ -123,8 +123,8 @@ jalankan: `bun prisma/seed.ts` (insert data user ke database)
 Menggunakan **ElysiaJs** (ringan untuk Bun). Modifikasi dengan menambahkan prisma untuk kelola path `"/user"`. Tambahkan port di cors origin apabila port frontend berubah (cth: 5174)
 
 ```ts
-import { PrismaClient } from "../generated/prisma/client";
-import { prisma } from '../lib/prisma';
+import { PrismaClient } from "../src/generated/prisma/client";
+import { prisma } from '../prisma/db';
 import type { ApiResponse, HealthCheck, User } from "shared";
 
 const app = new Elysia()
