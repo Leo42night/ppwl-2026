@@ -7,7 +7,6 @@ Berikut alur lengkap inisiasi monorepo dari awal hingga selesai:
 ---
 
 ## 1. Bootstrap awal
-Disarankan menggunakan terminal basis unix (git bash, mac, linux). Jika tidak dapat membuka git bash, ikuti [setup git bash](#setup-git-bash-in-terminal).
 ```bash
 mkdir monorepo && cd monorepo
 ```
@@ -41,6 +40,8 @@ Buat struktur folder (ini adalah perintah unix):
 ```bash
 mkdir -p apps packages/shared
 ```
+
+Kode `-p` menggunakan terminal basis unix (git bash, mac, linux). Jika tidak dapat membuka git bash, ikuti [setup git bash](#setup-git-bash-in-terminal), atau buat manual.
 
 ---
 
