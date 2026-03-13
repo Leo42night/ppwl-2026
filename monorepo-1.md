@@ -321,7 +321,7 @@ cd ../../
 
 ## 7. Root `tsconfig.json`
 
-Buat di root:
+Ganti isi file `tsconfig.json`:
 
 ```json
 {
