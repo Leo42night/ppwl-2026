@@ -270,7 +270,7 @@ Berisi shared item atau types yang dapat tiap apps akses.
 ```bash
 cd ../../packages/shared
 bun init -y
-rm README.md 
+rm -rf README.md index.ts
 ```
 
 **Edit `package.json`:**
