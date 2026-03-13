@@ -259,7 +259,7 @@ import App from './App2'
 
 ---
 
-# 6. Jalankan server
+# 6. Jalankan server (frontend & backend)
 ```bash
 cd ../..
 bun dev
