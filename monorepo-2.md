@@ -119,7 +119,7 @@ jalankan: `bun prisma/seed.ts` (insert data user ke database)
 
 # 4. Backend API
 
-`packages/backend/src/index.ts`
+`apps/backend/src/index.ts`
 
 Menggunakan **ElysiaJs** (ringan untuk Bun). Modifikasi dengan menambahkan prisma untuk kelola path `"/user"`. Tambahkan port di cors origin apabila port frontend berubah (cth: 5174)
 
