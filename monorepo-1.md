@@ -7,6 +7,7 @@ Berikut alur lengkap inisiasi monorepo dari awal hingga selesai:
 ---
 
 ## 1. Bootstrap awal
+gunakan `cmd`, jika command tidak jalan, batalkan dengan `Ctrl+PauseBreak` 
 ```bash
 mkdir monorepo && cd monorepo
 ```
