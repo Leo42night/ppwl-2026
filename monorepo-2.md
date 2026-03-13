@@ -25,12 +25,13 @@ export interface User {
 
 ---
 
-# 2. Prisma Sqlite (Backend)
+# 2. Prisma Sqlite (Install di apps\backend)
 Mengikuti [Setup](https://bun.com/docs/guides/ecosystem/prisma) dari Bun (dengan sedikit modifikasi).
 
 Install:
 
 ```bash
+cd apps\backend
 bun add -d prisma
 bun add @prisma/client @prisma/adapter-libsql dotenv
 ```
