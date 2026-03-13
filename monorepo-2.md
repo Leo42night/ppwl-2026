@@ -44,7 +44,7 @@ Prisma menggunakan adapter-bun untuk akses driver **bun:sqlite**.
 
 ## Konfigurasi Prisma
 
-Buat skema, tambahkan ini di `schema.prisma`:
+Buat skema, tambahkan beberapa konfig ini komponen `schema.prisma`:
 
 ```prisma
 generator client {
