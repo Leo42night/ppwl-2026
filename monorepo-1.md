@@ -284,7 +284,7 @@ rm -rf README.md index.ts
 }
 ```
 
-Buat **`src/index.ts`** berisi shared types:
+Buat **`packages/shared/src/index.ts`** berisi shared types:
 
 ```ts
 export interface HealthCheck {
