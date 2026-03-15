@@ -33,7 +33,7 @@ Install:
 ```bash
 cd apps\backend
 bun add -d prisma
-bun add @prisma/client @prisma/adapter-libsql dotenv
+bun add @prisma/client @prisma/adapter-libsql
 ```
 
 Inisialisasi Prisma dengan SQLite:
@@ -41,6 +41,7 @@ Inisialisasi Prisma dengan SQLite:
 bunx --bun prisma init --datasource-provider sqlite
 ```
 Prisma menggunakan adapter-bun untuk akses driver **bun:sqlite**. 
+
 ---
 
 ## Konfigurasi Prisma
@@ -62,10 +63,6 @@ model User {
 model User wajib type sama dengan **interface User** di `shared/src/index.ts` 
 **Prisma v5 + prisma.config.ts**, environment variable **tidak otomatis dimuat** seperti pada Prisma versi lama. Kita harus **load** .env **sendiri**.
 
-Tambahkan import `apps/backend/prisma.config.ts`:
-```ts
-import "dotenv/config"; // url: env("DATABASE_URL") dari prisma config akan otomatis terbaca 
-```
 ---
 ## Generate Prisma
 
