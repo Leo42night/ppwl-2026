@@ -7,7 +7,8 @@ Berikut alur lengkap inisiasi monorepo dari awal hingga selesai:
 ---
 
 ## 1. Bootstrap awal
-gunakan `cmd`, jika command tidak jalan, batalkan dengan `Ctrl+PauseBreak` 
+Command di sini menggunakan basis unix (linux, mac, git bash), ada diberi contoh command yang sama untuk versi cmd. 
+> Tips: jika pakai `cmd`, jika command tidak jalan, batalkan dengan `Ctrl+PauseBreak` 
 ```bash
 mkdir monorepo && cd monorepo
 ```
@@ -33,16 +34,18 @@ Lalu **edit `package.json`** di root menjadi:
 Hapus `index.ts` yang dibuat bun init — root tidak butuh entry point.
 
 ```bash
-rm index.ts
+rm index.ts # linux/mac/git bash command
+del index.ts # cmd
 ```
 
 Buat struktur folder (ini adalah perintah unix):
 
 ```bash
-mkdir -p apps packages/shared
+mkdir -p apps packages/shared # linux/mac/git bash
+mkdir apps packages\shared # cmd
 ```
 
-Kode `-p` menggunakan terminal basis unix (git bash, mac, linux). Jika tidak dapat membuka git bash, ikuti [setup git bash](#setup-git-bash-in-terminal), atau buat manual.
+Kode `-p` menggunakan terminal basis unix (git bash, mac, linux). Jika tidak dapat membuka git bash, ikuti [setup git bash](#setup-git-bash-in-terminal), atau gunakan cmd, atau buat manual.
 
 ---
 
@@ -52,7 +55,8 @@ Kode `-p` menggunakan terminal basis unix (git bash, mac, linux). Jika tidak dap
 cd apps
 bunx create-vite frontend --template react-ts # vite beta v8 (No), install with bun & start now (No)
 cd frontend && bun install
-rm -rf .git # hapus git repo hasil inisiasi template vite react
+rm -rf .git # unix: hapus git repo hasil inisiasi template vite react
+rmdir /S /Q .git # cmd: /S (hapus juga Subfolder), /Q (Quiet, tanpa konfirmasi)
 ```
 
 Jika butuh NodeJs versi tertentu, ikuti proses [nvm](#setup-nvm) (untuk mengelola versi NodeJs). 
